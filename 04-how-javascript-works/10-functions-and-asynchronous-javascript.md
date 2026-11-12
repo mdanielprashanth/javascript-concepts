@@ -510,6 +510,132 @@ JavaScript supports these principles but does not enforce them.
 
 ---
 
+## 9. Currying
+
+Currying transforms a function that accepts multiple arguments into a sequence of functions, each accepting one argument at a time.
+
+### Example
+
+```javascript
+function multiply(a) {
+    return function (b) {
+        return function (c) {
+            return a * b * c;
+        };
+    };
+}
+
+console.log(multiply(2)(3)(2)); // 12
+```
+
+### How it works
+
+1. `multiply(2)` returns a function that remembers `a = 2`.
+2. The next function receives `b = 3`.
+3. The final function receives `c = 2`.
+4. The result is `2 * 3 * 2 = 12`.
+
+Closures allow the returned functions to remember previously passed arguments.
+
+### Interview takeaway
+
+Currying transforms a function with multiple arguments into a sequence of functions that accept one argument at a time.
+
+---
+
+## 10. Polyfills
+
+A **polyfill** is a custom implementation that provides functionality similar to a native JavaScript feature.
+
+Polyfills help understand how built-in JavaScript methods work internally.
+
+### Example 1: Implementing map()
+
+The native `map()` method creates a new array by applying a callback function to every existing element.
+
+```javascript
+Array.prototype.myMap = function (callback) {
+    const result = [];
+
+    for (let i = 0; i < this.length; i++) {
+        if (i in this) {
+            result[i] = callback(this[i], i, this);
+        }
+    }
+
+    return result;
+};
+
+const numbers = [1, 2, 3];
+
+const doubled = numbers.myMap((num) => num * 2);
+
+console.log(doubled); // [2, 4, 6]
+```
+
+The callback receives three arguments:
+
+- `this[i]`: Current element.
+- `i`: Current index.
+- `this`: Original array.
+
+The `i in this` condition skips empty slots (sparse array holes), as native `map()` does.
+
+### Example 2: Implementing filter()
+
+The native `filter()` method creates a new array containing elements for which the callback returns a truthy value.
+
+```javascript
+Array.prototype.myFilter = function (callback) {
+    const result = [];
+
+    for (let i = 0; i < this.length; i++) {
+        if (i in this && callback(this[i], i, this)) {
+            result.push(this[i]);
+        }
+    }
+
+    return result;
+};
+
+const numbers = [1, 2, 3, 4];
+
+const evenNumbers = numbers.myFilter((num) => num % 2 === 0);
+
+console.log(evenNumbers); // [2, 4]
+```
+
+### map() vs filter()
+
+| map() | filter() |
+|---|---|
+| Transforms every existing element. | Selects elements based on a condition. |
+| Returns callback results. | Returns original elements that pass the condition. |
+| Usually preserves array length, including holes. | Can return a shorter array. |
+
+### Sparse arrays
+
+A sparse array contains empty slots.
+
+```javascript
+const numbers = [10, , 30];
+
+console.log(numbers.length); // 3
+console.log(1 in numbers);   // false
+```
+
+Native `map()` and `filter()` skip these empty slots.
+
+This is why our implementations check `i in this`.
+
+### Important note
+
+These are simplified educational implementations, not complete native-compatible polyfills. Full implementations must also handle details such as invalid callbacks, `thisArg`, array-like objects and other specification requirements.
+
+### Interview takeaway
+
+Understand how `map()` transforms elements, how `filter()` selects elements, and why callbacks receive `(element, index, array)`.
+
 ## Quick Interview Revision
 
 | Concept | Key point |
